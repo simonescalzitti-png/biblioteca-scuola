@@ -26,6 +26,11 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Nunito',sans-serif;background:#FFF8F5;color:var(--text);min-height:100vh;overflow-x:hidden}
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
 
 /* ── VIEWS ── */
 #viewStudent{display:block} #viewAdmin{display:none}
