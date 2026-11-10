@@ -24,6 +24,14 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 8px;b
 .big-in{font-size:30px;text-align:center;letter-spacing:3px;text-transform:uppercase}
 .stars button{font-size:28px;background:#fff;color:#e8a317;padding:4px 10px}
 @media print{header,.tabs,button,.noprint,.banner{display:none!important}body{background:#fff}.card{box-shadow:none}}
+.hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:10px 0 18px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:26px;font-weight:700;padding:34px 18px;border-radius:26px;color:#fff;box-shadow:0 8px 20px #0002;transition:transform .15s}.tile:hover,.tile:active{transform:scale(1.03)}.tile span{font-size:70px;line-height:1}.tile small{font-size:15px;font-weight:400}
+.t1{background:linear-gradient(135deg,#2f9e5b,#6fd08c)}.t2{background:linear-gradient(135deg,#e8791a,#f6b64d)}.t3{background:linear-gradient(135deg,#2b6cb0,#4cc3e8);width:100%;padding:22px;font-size:24px}.t3 span{font-size:48px}
+.entra{margin-bottom:14px}body.banco{min-height:100vh;background:linear-gradient(180deg,#e4f3ff,#fff4e0) fixed}body.banco header{background:linear-gradient(90deg,#2b6cb0,#4cc3e8)}
+.panel{background:#fff;border-radius:26px;padding:22px;box-shadow:0 8px 22px #0001;text-align:center;margin-bottom:14px}.panel h2{font-size:26px;margin:6px 0 14px}.emo{font-size:64px;line-height:1}
+.dots{display:flex;gap:8px;justify-content:center;margin-bottom:6px}.dots i{width:14px;height:14px;border-radius:50%;background:#d5e1ee}.dots i.on{background:var(--b);transform:scale(1.25)}
+.ticket{display:flex;gap:14px;align-items:center;border:3px dashed var(--g,#999);border-radius:18px;padding:14px;margin:10px 0;background:#fdfdff}.ticket.big{justify-content:center;text-align:left;padding:22px}.big2{font-size:20px;padding:14px 20px}
+.pop{animation:pop .45s ease}@keyframes pop{0%{transform:scale(.8);opacity:0}70%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
 </style></head><body>
 <header><h1 id="ttl">📚 Biblioteca di classe</h1><span id="hb"></span></header>
 <main id="app"></main><div id="ov"></div>
@@ -91,25 +99,26 @@ function render(){const H=$('#hb');let b='';
   if(ui.admin)b='<button class="sec" data-act="banco">🧑‍🏫 Banco prestiti</button> <button class="sec" data-act="esci">Esci</button>';
   else if(ui.user)b=`<span>👤 ${esc(ui.user)}</span> <button class="sec" data-act="esci">Esci</button>`;
   else b='<button class="sec" data-act="loginT">🔑 Insegnante</button>'}
- H.innerHTML=b;const A=$('#app');
+ H.innerHTML=b;const A=$('#app');document.body.classList.toggle('banco',!!ui.banco);
  if(ui.banco)A.innerHTML=bancoHTML();
  else if(ui.admin)A.innerHTML=adminHTML();
  else if(ui.user)A.innerHTML=ldsHTML()+`<div class="card"><h2>🏅 I tuoi traguardi</h2>${badgeHTML(ui.user)}</div><div class="card"><h2>⭐ Per te</h2>${suggHTML(ui.user,6)}</div><h2>Tutti i libri</h2>${filtri()}<div id="lst">${listaLibri()}</div>`;
- else A.innerHTML=ldsHTML()+`<div class="card" style="text-align:center"><h2>Ciao! Scrivi il tuo codice</h2><input id="cod" class="big-in" maxlength="12" placeholder="CODICE" autocomplete="off"><p><button class="big" data-act="entra">Entra ➜</button></p></div><h2>Guarda i libri</h2>${filtri()}<div id="lst">${listaLibri()}</div>`;
+ else A.innerHTML=`<div class="entra"><button class="tile t3" data-act="bancoPw"><span>🧑‍🏫</span>Banco prestiti<small>per i bibliotecari</small></button></div>`+ldsHTML()+`<div class="card" style="text-align:center"><h2>Ciao! Scrivi il tuo codice</h2><input id="cod" class="big-in" maxlength="12" placeholder="CODICE" autocomplete="off"><p><button class="big" data-act="entra">Entra ➜</button></p></div><h2>Guarda i libri</h2>${filtri()}<div id="lst">${listaLibri()}</div>`;
  const q=$('#q');if(q&&ui.focus){q.focus();q.setSelectionRange(q.value.length,q.value.length)}}
 // Banco prestiti
+function dots(n,tot){return`<div class="dots">${Array.from({length:tot},(_,i)=>`<i class="${i<n?'on':''}"></i>`).join('')}</div>`}
 function bancoHTML(){const b=ui.bs;
- if(S.bibs.length&&!ui.turno)return`<div class="card" style="text-align:center"><h2>Chi è il bibliotecario di turno?</h2><div class="row" style="justify-content:center">${S.bibs.map(c=>`<button class="big" data-act="turno" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>`;
- if(b.m==='w')return`<div class="card"><p><button class="sec" data-act="bm" data-v="">⬅ Indietro</button></p><h2>⭐ Scegli il libro della settimana</h2>${filtri()}<div id="lst">${listaLibri()}</div></div>`;
- if(!b.m)return`<div class="card" style="text-align:center"><h2>Cosa vuoi fare?</h2><p><button class="big ok" data-act="bm" data-v="p">📕 Prendere un libro</button></p><p><button class="big" data-act="bm" data-v="r">↩️ Restituire un libro</button></p><p><button class="sec" data-act="bm" data-v="w">⭐ Libro della settimana</button></p></div>${ultime()}`;
- const back='<p><button class="sec" data-act="bm" data-v="">⬅ Indietro</button></p>';
- if(!b.cod)return`<div class="card" style="text-align:center">${back}<span class="step">Passo 1 di ${b.m==='p'?3:2}</span><h2>Chi è il lettore? Scrivi il suo codice</h2><input id="bcod" class="big-in" maxlength="12" autocomplete="off"><p><button class="big" data-act="bcod">Avanti ➜</button></p></div>`;
+ const back='<p style="text-align:left"><button class="sec" data-act="bm" data-v="">⬅ Indietro</button></p>';
+ if(S.bibs.length&&!ui.turno)return`<div class="panel"><div class="emo">🧑‍🏫</div><h2>Chi è il bibliotecario di turno?</h2><div class="row" style="justify-content:center">${S.bibs.map(c=>`<button class="big" data-act="turno" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>`;
+ if(b.m==='ok')return`<div class="panel pop"><div class="emo">🎉</div><h2>${b.t==='r'?'Libro restituito!':'Buona lettura!'}</h2><p style="font-size:20px">${b.t==='r'?'Grazie, '+esc(b.cod)+'!':esc(b.cod)+' ha preso<br><b>'+esc(b.titolo)+'</b>'}</p>${b.t==='r'?`<p>Com’era? <span class="stars">${[1,2,3].map(n=>`<button data-act="voto" data-v="${n}">${'★'.repeat(n)}</button>`).join('')}</span></p><h3>I tuoi traguardi</h3>${badgeHTML(b.cod)}<h3>Ti consigliamo questi:</h3>${suggHTML(b.cod,3)}`:''}<button class="big" data-act="bm" data-v="">Fine ✔</button></div>`;
+ if(b.m==='w')return`<div class="panel">${back}<div class="emo">⭐</div><h2>Scegli il libro della settimana</h2>${filtri()}<div id="lst" style="text-align:left">${listaLibri()}</div></div>`;
+ if(!b.m)return`<div class="hero"><button class="tile t1" data-act="bm" data-v="p"><span>📕</span>Prendo un libro</button><button class="tile t2" data-act="bm" data-v="r"><span>↩️</span>Restituisco un libro</button></div><p style="text-align:center"><button class="sec" data-act="bm" data-v="w">⭐ Libro della settimana</button></p>${ultime()}`;
+ const tot=b.m==='p'?3:2;
+ if(!b.cod)return`<div class="panel">${back}${dots(1,tot)}<div class="emo">👋</div><h2>Ciao! Scrivi il tuo codice</h2><input id="bcod" class="big-in" maxlength="12" autocomplete="off" placeholder="CODICE"><p><button class="big ok" data-act="bcod">Avanti ➜</button></p></div>`;
  if(b.m==='r'){const a=S.prestiti.filter(p=>p.cod===b.cod&&!p.reso);
-  if(b.fatto){return`<div class="card" style="text-align:center"><h2>✅ Libro restituito!</h2><p>Com’era? Tocca le stelle</p><div class="stars">${[1,2,3].map(n=>`<button data-act="voto" data-v="${n}">${'★'.repeat(n)}</button>`).join('')}</div><h3>I tuoi traguardi</h3>${badgeHTML(b.cod)}<h3>Ti consigliamo questi:</h3>${suggHTML(b.cod,3)}<p><button class="big" data-act="bm" data-v="">Fine</button></p></div>`}
-  return`<div class="card">${back}<span class="step">Passo 2 di 2</span><h2>Libri di ${esc(b.cod)} da restituire</h2>${a.length?a.map(p=>{const l=libro(p.libro);return`<div class="row card"><div class="f"><b>${esc(l.titolo)}</b><div class="small">preso il ${gg(p.dal)}</div></div><button class="ok" data-act="rendi" data-v="${p.pid}">↩️ Restituisci</button></div>`}).join(''):'<p>Nessun libro da restituire 🎉</p>'}</div>`}
- // prestito
- if(!b.libro){return`<div class="card">${back}<span class="step">Passo 2 di 3</span><h2>Che libro prende ${esc(b.cod)}?</h2>${filtri()}<div id="lst">${listaLibri()}</div></div>`}
- const l=libro(b.libro);return`<div class="card" style="text-align:center"><p><button class="sec" data-act="bl" data-v="0">⬅ Cambia libro</button></p><span class="step">Passo 3 di 3</span><h2>Conferma</h2><p style="font-size:22px">👤 <b>${esc(b.cod)}</b> prende<br>📕 <b>${esc(l.titolo)}</b></p><button class="big ok" data-act="conf">✅ Conferma prestito</button></div>`}
+  return`<div class="panel">${back}${dots(2,2)}<div class="emo">↩️</div><h2>${esc(b.cod)}, quale libro restituisci?</h2>${a.length?a.map(p=>{const l=libro(p.libro);return`<div class="ticket" style="--g:${GC[l.genere]||'#999'}"><div class="f" style="text-align:left"><b>${GI[l.genere]||'📖'} ${esc(l.titolo)}</b><div class="small">preso il ${gg(p.dal)}</div></div><button class="ok big2" data-act="rendi" data-v="${p.pid}">↩️ Restituisci</button></div>`}).join(''):'<p style="font-size:20px">Nessun libro da restituire 🎉</p>'}</div>`}
+ if(!b.libro)return`<div class="panel">${back}${dots(2,3)}<div class="emo">🔎</div><h2>Che libro prende ${esc(b.cod)}?</h2>${filtri()}<div id="lst" style="text-align:left">${listaLibri()}</div></div>`;
+ const l=libro(b.libro);return`<div class="panel">${dots(3,3)}<div class="emo">🎟️</div><h2>Controlla e conferma</h2><div class="ticket big" style="--g:${GC[l.genere]||'#999'}"><div style="font-size:54px">${GI[l.genere]||'📖'}</div><div><div class="small">Lettore</div><b style="font-size:26px">${esc(b.cod)}</b><div class="small" style="margin-top:8px">Libro</div><b style="font-size:22px">${esc(l.titolo)}</b><div class="small">${esc(l.autore)}</div></div></div><p class="row" style="justify-content:center"><button class="sec" data-act="bl" data-v="0">✏️ Cambia libro</button><button class="big ok" data-act="conf">✅ Conferma</button></p></div>`}
 function ultime(){const l=S.log.slice(-5).reverse();return`<div class="card"><h3>Ultime operazioni</h3>${l.length?l.map(o=>`<div class="small">${o.a==='prestito'?'📕':'↩️'} ${esc(o.cod)} · ${esc(libro(o.libro)?.titolo)} · ${new Date(o.t).toLocaleString('it-IT')}${o.bib?' · turno '+esc(o.bib):''}</div>`).join(''):'<p class="small">Ancora niente.</p>'}${l.length?'<p><button class="sec" data-act="undo">↩️ Annulla ultima operazione</button></p>':''}</div>`}
 // Admin
 function adminHTML(){const T=[['dash','📊 Cruscotto'],['pres','📤 Prestiti'],['cat','📚 Catalogo'],['let','👤 Lettori'],['sol','🖨️ Da sollecitare'],['fer','⏸ Libri fermi'],['tur','🧑‍🏫 Turni'],['bak','💾 Backup e impostazioni']];
@@ -144,15 +153,16 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
  if(a==='okpw'){if($('#pw').value===S.pwd){ui.admin=true;modal('');R()}else toast('Password errata');return}
  if(a==='entra'){const c=norm($('#cod').value);if(!codeOk(c))return toast('Codice non valido. Chiedi alla maestra.');ui.user=c;return R()}
  if(a==='esci'){ui.user=null;ui.admin=false;ui.tab='dash';return R()}
+ if(a==='bancoPw'){modal(`<h3>🧑‍🏫 Banco prestiti</h3><p>Password della maestra</p><input id="pwB" type="password"><p class="row"><button data-act="okBanco">Entra</button><button class="sec" data-act="chiudi">Annulla</button></p>`);return}
+ if(a==='okBanco'){if($('#pwB').value===S.pwd){modal('');ui.banco=true;ui.bs={};ui.q=ui.g=ui.e='';R()}else toast('Password errata');return}
  if(a==='banco'){ui.banco=true;ui.bs={};ui.q=ui.g=ui.e='';return R()}
- if(a==='esciBanco'){modal(`<h3>Uscire dal banco?</h3><p>Serve la password della maestra.</p><input id="pw2" type="password"><p><button data-act="okEsci">Esci</button></p>`);return}
- if(a==='okEsci'){if($('#pw2').value===S.pwd){ui.banco=false;ui.admin=true;modal('');R()}else toast('Password errata');return}
+ if(a==='esciBanco'){ui.banco=false;ui.bs={};ui.turno='';return R()}
  if(a==='bm'){ui.bs=v?{m:v}:{};ui.q=ui.g=ui.e='';return R()}
  if(a==='bcod'){const c=norm($('#bcod').value);if(!codeOk(c))return toast('Codice non valido');ui.bs.cod=c;return R()}
  if(a==='bl'){ui.bs.libro=+v||0;return R()}
- if(a==='conf'){const r=presta(ui.bs.libro,ui.bs.cod,true);if(r)toast(r);else{toast('✅ Prestito registrato!');ui.bs={}}return R()}
- if(a==='rendi'){rendi(+v,true);ui.bs.fatto=+v;toast('↩️ Reso registrato');return R()}
- if(a==='voto'){const p=S.prestiti.find(x=>x.pid===ui.bs.fatto);if(p){p.voto=+v;save()}toast('Grazie!');return}
+ if(a==='conf'){const r=presta(ui.bs.libro,ui.bs.cod,true);if(r){toast(r);ui.bs={}}else ui.bs={m:'ok',t:'p',cod:ui.bs.cod,titolo:libro(ui.bs.libro).titolo};return R()}
+ if(a==='rendi'){const p=S.prestiti.find(x=>x.pid===+v);rendi(+v,true);ui.bs={m:'ok',t:'r',cod:p.cod,fatto:+v};return R()}
+ if(a==='voto'){const p=S.prestiti.find(x=>x.pid===ui.bs.fatto);if(ui.bs.m==='ok'&&ui.bs.t==='r')ui.bs.voted=1;if(p){p.voto=+v;save()}toast('Grazie!');return}
  if(a==='undo'){const r=annulla();toast(r||'Operazione annullata');return R()}
  if(a==='tab'){ui.tab=v;ui.q='';return R()}
  if(a==='rendiA'){rendi(+v,false);return R()}
@@ -174,7 +184,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){ui.q=e.target.value;const l=$('#lst');if(l)l.innerHTML=listaLibri();else{ui.focus=1;render()}}});
 document.addEventListener('change',e=>{if(e.target.id==='minq'){ui.min=+e.target.value;render();return}if(e.target.id==='bh'){S.bancoHome=e.target.checked;save();return}if(e.target.id==='imp'){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!d.libri)throw 0;if(d.v!==5){d=conv(d.libri,d.utenti,d.whitelist,S.pwd)}if(!d.prestiti)throw 0;S=d;save();toast('Backup ripristinato');render()}catch(x){toast('File non valido')}};r.readAsText(f)}});
-document.addEventListener('keydown',e=>{if(e.key==='Enter'){const b=e.target.id==='cod'?'entra':e.target.id==='bcod'?'bcod':e.target.id==='pw'?'okpw':e.target.id==='pw2'?'okEsci':'';if(b){const x=document.querySelector('[data-act='+b+']');x&&x.click()}}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){const b=e.target.id==='cod'?'entra':e.target.id==='bcod'?'bcod':e.target.id==='pw'?'okpw':e.target.id==='pwB'?'okBanco':e.target.id==='pw2'?'okEsci':'';if(b){const x=document.querySelector('[data-act='+b+']');x&&x.click()}}});
 function info(id){const l=libro(id);const mia=ui.user&&attivi(id).some(p=>p.cod===ui.user);
  if(ui.banco){if(ui.bs.m==='w'){modal(`<h3>⭐ ${esc(l.titolo)}</h3><p>Perché lo consigli? (facoltativo, senza nomi)</p><input id="ln" maxlength="140"><p class="row"><button class="ok" data-act="lds" data-id="${id}">Scegli questo libro</button><button class="sec" data-act="chiudi">Annulla</button></p>`);return}ui.bs.libro=id;modal('');return render()}
  modal(`<h2>${GI[l.genere]||'📖'} ${esc(l.titolo)}</h2><p>${esc(l.autore)}</p><p><span class="tag">${l.genere}</span><span class="tag">dai ${l.eta} anni</span></p><p>${dispTag(l)}</p>${ui.user&&!mia&&disp(l)>0&&!ui.admin?`<p class="small">Vai dal bibliotecario per prenderlo in prestito.</p>`:''}<p><button class="sec" data-act="chiudi">Chiudi</button></p>`)}
